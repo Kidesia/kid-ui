@@ -1,0 +1,37 @@
+:root {
+	--hue: 100;
+
+	--clr-primary: oklch(60% 0.2 var(--hue));
+	--clr-on-primary: oklch(1 0 0);
+	--clr-primary-container: oklch(83% 0.08 var(--hue));
+	--clr-on-primary-container: oklch(40% 0.1 var(--hue));
+
+	--clr-secondary: oklch(50% 0.2 calc(var(--hue) + 30));
+	--clr-on-secondary: oklch(1 0 0);
+	--clr-secondary-container: oklch(91.58% 0.0339 calc(var(--hue) + 30));
+	--clr-on-secondary-container: oklch(39.76% 0.0336 calc(var(--hue) + 30));
+
+	--clr-tertiary: oklch(0.5 0.2 calc(var(--hue) + 70));
+	--clr-on-tertiary: oklch(1 0 0);
+	--clr-tertiary-container: oklch(92% 0.08 calc(var(--hue) + 70));
+	--clr-on-tertiary-container: oklch(38.24% 0.1 calc(var(--hue) + 70));
+
+	--clr-surface: oklch(99.59% 0.025 var(--hue));
+	--clr-surface-container-lowest: oklch(100% 0.02 var(--hue));
+	--clr-surface-container-low: oklch(96.59% 0.025 var(--hue));
+	--clr-surface-container: oklch(94.79% 0.03 var(--hue));
+	--clr-surface-container-high: oklch(92.97% 0.035 var(--hue));
+	--clr-surface-container-highest: oklch(91.15% 0.025 var(--hue));
+
+	--clr-illustration-1: oklch(97% 5% var(--hue));
+	--clr-illustration-2: oklch(92% 7% var(--hue));
+	--clr-illustration-3: oklch(87% 9% var(--hue));
+	--clr-illustration-4: oklch(82% 11% var(--hue));
+	--clr-illustration-5: oklch(77% 13% var(--hue));
+
+	--clr-on-surface: oklch(31.15% 0.025 var(--hue));
+	--clr-on-surface-variant: oklch(51.15% 0.1 var(--hue));
+
+	--clr-outline: oklch(82% 0.02 var(--hue));
+	--clr-outline-variant: oklch(86% 0.03 var(--hue));
+}
