@@ -1,41 +1,67 @@
 <script lang="ts" module>
-	export type ButtonProps = {
+	import type { ConfirmProps } from '$lib/Confirm/index.svelte';
+
+	export type ButtonProps = HTMLButtonAttributes & {
 		Icon?: Component;
 		label?: string;
 		variant?: 'primary' | 'secondary' | 'tertiary' | 'fab';
 		colorSchema?: 'primary' | 'secondary' | 'tertiary';
-		disabled?: boolean;
-		submit?: boolean;
-		ariaLabel?: string;
-		onclick?: MouseEventHandler<HTMLButtonElement>;
+		confirm?: Omit<ConfirmProps, 'onclose' | 'onsubmit'>;
+		onclick?: () => Promise<void> | void;
 	};
 </script>
 
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import type { MouseEventHandler } from 'svelte/elements';
-	import Spinner from './Spinner.svelte';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
+
+	import Confirm from '../Confirm/index.svelte';
 
 	const {
 		Icon,
 		label,
 		variant = 'secondary',
 		colorSchema = 'primary',
-		disabled = false,
-		ariaLabel,
-		submit,
-		onclick
+		disabled,
+		confirm,
+		onclick,
+		...buttonProps
 	}: ButtonProps = $props();
 
 	let loading = $state(false);
+
+	let isDiplayingConfirm = $state(false);
 </script>
 
-{#snippet Content()}
-	{#if loading}
-		<div class="spinner-container">
-			<Spinner />
-		</div>
-	{/if}
+{#if confirm && isDiplayingConfirm}
+	<Confirm
+		{...confirm}
+		submitLabel={confirm.submitLabel ?? label}
+		onclose={() => (isDiplayingConfirm = false)}
+		onsubmit={() => {
+			onclick?.();
+		}}
+	/>
+{/if}
+
+<button
+	{...buttonProps}
+	class="variant-{variant} color-schema-{colorSchema}"
+	disabled={disabled || loading}
+	onclick={async (event) => {
+		if (confirm) {
+			isDiplayingConfirm = true;
+			return;
+		} else if (onclick) {
+			loading = true;
+			try {
+				await onclick(event);
+			} finally {
+				loading = false;
+			}
+		}
+	}}
+>
 	{#if Icon}
 		<span class="icon">
 			<Icon />
@@ -46,25 +72,6 @@
 			{label}
 		</span>
 	{/if}
-{/snippet}
-
-<button
-	type={submit ? 'submit' : 'button'}
-	class="{variant} color-schema-{colorSchema}"
-	disabled={disabled || loading}
-	aria-label={ariaLabel}
-	onclick={async (event) => {
-		if (onclick) {
-			loading = true;
-			try {
-				await onclick(event);
-			} finally {
-				loading = false;
-			}
-		}
-	}}
->
-	{@render Content()}
 </button>
 
 <style>
@@ -95,7 +102,7 @@
 			border-radius: 2rem;
 		}
 
-		&.primary {
+		&.variant-primary {
 			font-weight: 600;
 
 			&.color-schema-primary {
@@ -114,7 +121,7 @@
 			}
 		}
 
-		&.secondary {
+		&.variant-secondary {
 			background-color: var(--clr-surface-container-highest);
 		}
 
@@ -126,15 +133,6 @@
 	.icon {
 		font-size: 1.25rem;
 		flex-shrink: 0;
-	}
-
-	.loading-contents {
-		flex-grow: 1;
-		display: flex;
-		min-height: 1.5em;
-		justify-content: center;
-		align-items: center;
-		gap: 1rem;
 	}
 
 	.spinner-container {

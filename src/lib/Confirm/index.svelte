@@ -1,23 +1,23 @@
+<script lang="ts" module>
+	export type ConfirmProps = {
+		message: string;
+		cancelLabel?: string;
+		submitLabel?: string;
+		onsubmit?: () => Promise<void> | void;
+		onclose: () => void;
+	};
+</script>
+
 <script lang="ts">
-	import type { Snippet } from 'svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { fade, scale } from 'svelte/transition';
 
-	import type { ButtonProps } from './Button.svelte';
-	import i18n from '$lib/i18n/index.svelte';
-	import Button from './Button.svelte';
+	import Button from '../Button/index.svelte';
 
-	type DialogProps = ButtonProps & {
-		submitLabel?: string;
-		onsubmit?: () => Promise<void>;
-		children: Snippet;
-	};
-
-	const { onclick, submitLabel, onsubmit, children, ...btnProps }: DialogProps = $props();
+	const { message, cancelLabel, submitLabel, onsubmit, onclose }: ConfirmProps = $props();
 
 	const {
-		elements: { trigger, portalled, overlay, content, close },
-		states: { open }
+		elements: { portalled, overlay, content }
 	} = createDialog({
 		role: 'alertdialog'
 	});
@@ -25,27 +25,24 @@
 
 <div use:melt={$portalled}>
 	<div use:melt={$overlay} transition:fade={{ duration: 150 }} class="overlay"></div>
-
 	<div use:melt={$content} transition:scale={{ duration: 150 }} class="dialog-container">
-		<div class="dialog">
-			{@render children()}
+		<main class="dialog">
+			{message}
 
-			<div class="row">
-				<button class="no-style" use:melt={$close}>
-					<Button dummy type="tertiary" label={i18n.t('common.cancel')} />
-				</button>
+			<footer>
+				<Button variant="tertiary" label={cancelLabel ?? 'Cancel'} onclick={onclose} />
 				{#if onsubmit}
 					<Button
-						type="primary"
-						label={submitLabel ?? i18n.t('common.submit')}
+						variant="primary"
+						label={submitLabel ?? 'OK'}
 						onclick={async () => {
 							await onsubmit();
-							open.set(false);
+							onclose();
 						}}
 					/>
 				{/if}
-			</div>
-		</div>
+			</footer>
+		</main>
 	</div>
 </div>
 
@@ -76,13 +73,9 @@
 		border-radius: 1rem;
 	}
 
-	.row {
+	footer {
 		display: flex;
 		justify-content: flex-end;
 		gap: 0.5rem;
-
-		:global(> button) {
-			flex: 1;
-		}
 	}
 </style>
